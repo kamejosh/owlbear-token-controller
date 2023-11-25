@@ -31,7 +31,7 @@
         "vite-plugin-mkcert": "^1.16.0"
     },
     "dependencies": {
-        "@owlbear-rodeo/sdk": "1.3.10",
+        "@owlbear-rodeo/sdk": "2",
         "@tanstack/react-query": "^4.32.0",
         "axios": "^1.4.0",
         "blurred": "^2.0.0",

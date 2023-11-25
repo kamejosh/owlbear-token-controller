@@ -1,0 +1,16 @@
+{
+    "name": "Token Controller",
+    "version": "0.0.1",
+    "manifest_version": 1,
+    "author": "Joshua Hercher",
+    "description": "An extension to controll the selected token",
+    "icon": "/icon.svg",
+    "action": {
+        "title": "Token Controller",
+        "icon": "/icon.svg",
+        "popover": "/",
+        "height": 400,
+        "width": 300
+    },
+    "background_url": "/background.html"
+}

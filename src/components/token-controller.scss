@@ -1,0 +1,32 @@
+.wheel-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.wheel {
+    position: relative;
+    transform: rotate(var(--rotation));
+    outline: 10px solid white;
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+
+    &::before,
+    &::after {
+        position: absolute;
+        left: 50%;
+        background-color: white;
+        width: 2px;
+        height: 10px;
+        content: "";
+    }
+
+    &::before {
+        top: 0;
+    }
+
+    &::after {
+        bottom: 0;
+    }
+}

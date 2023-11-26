@@ -61,13 +61,18 @@ const Content = () => {
         }
     };
 
-    const stop = (e: MouseEvent) => {
+    const stop = async (e: MouseEvent) => {
         e.preventDefault();
         setAngle(angle + rotation);
         setStart(null);
         if (interaction) {
             const [_, stop] = interaction;
             stop();
+            await OBR.scene.items.updateItems(selected, (items) => {
+                items.forEach((item) => {
+                    item.rotation = rotation;
+                });
+            });
         }
         setInteraction(null);
     };

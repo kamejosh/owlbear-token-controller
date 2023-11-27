@@ -1,5 +1,11 @@
 import { ContextWrapper } from "./ContextWrapper.tsx";
-import { CSSProperties, useEffect, useState, MouseEvent as ReactMouseEvent } from "react";
+import {
+    CSSProperties,
+    useEffect,
+    useState,
+    MouseEvent as ReactMouseEvent,
+    TouchEvent as ReactTouchEvent,
+} from "react";
 import OBR, { InteractionManager, Item } from "@owlbear-rodeo/sdk";
 import "./token-controller.scss";
 import { SceneReadyContext } from "../context/SceneReadyContext.ts";
@@ -26,7 +32,7 @@ const Content = () => {
         "--rotation": `${rotation}deg`,
     } as CSSProperties;
 
-    const startMove = async (e: ReactMouseEvent<HTMLDivElement, MouseEvent>) => {
+    const startMove = async (e: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactTouchEvent<HTMLDivElement>) => {
         const items = await OBR.scene.items.getItems(selected);
         setInteraction(await OBR.interaction.startItemInteraction(items));
         e.preventDefault();
@@ -36,17 +42,28 @@ const Content = () => {
             x: rect.left + rect.width / 2,
             y: rect.top + rect.height / 2,
         };
-
-        const x = e.clientX - center.x;
-        const y = e.clientY - center.y;
+        let x, y: number;
+        if ("touches" in e) {
+            x = e.touches[0].clientX - center.x;
+            y = e.touches[0].clientY - center.y;
+        } else {
+            x = e.clientX - center.x;
+            y = e.clientY - center.y;
+        }
         setStart({ angle: radToDeg * Math.atan2(y, x), center: center });
     };
 
-    const move = async (e: MouseEvent) => {
+    const move = async (e: MouseEvent | TouchEvent) => {
         if (start) {
             e.preventDefault();
-            const x = e.clientX - start.center.x;
-            const y = e.clientY - start.center.y;
+            let x, y: number;
+            if ("touches" in e) {
+                x = e.touches[0].clientX - start.center.x;
+                y = e.touches[0].clientY - start.center.y;
+            } else {
+                x = e.clientX - start.center.x;
+                y = e.clientY - start.center.y;
+            }
             const degrees = radToDeg * Math.atan2(y, x);
             const rotation = angle + (degrees - start.angle);
             if (interaction) {
@@ -61,7 +78,7 @@ const Content = () => {
         }
     };
 
-    const stop = async (e: MouseEvent) => {
+    const stop = async (e: MouseEvent | TouchEvent) => {
         e.preventDefault();
         setAngle(angle + rotation);
         setStart(null);
@@ -107,10 +124,14 @@ const Content = () => {
     useEffect(() => {
         window.addEventListener("mousemove", move);
         window.addEventListener("mouseup", stop);
+        window.addEventListener("touchmove", move);
+        window.addEventListener("touchend", stop);
 
         return () => {
             window.removeEventListener("mousemove", move);
             window.removeEventListener("mouseup", stop);
+            window.removeEventListener("touchmove", move);
+            window.removeEventListener("touchend", stop);
         };
     }, [start]);
 
@@ -133,7 +154,12 @@ const Content = () => {
             <h1>Token Controller</h1>
             {selected.length > 0 ? (
                 <div className={"wheel-wrapper"}>
-                    <div className={"wheel"} style={style} onMouseDown={(e) => startMove(e)}></div>
+                    <div
+                        className={"wheel"}
+                        style={style}
+                        onMouseDown={(e) => startMove(e)}
+                        onTouchStart={(e) => startMove(e)}
+                    ></div>
                 </div>
             ) : (
                 "Select tokens"
